@@ -1,0 +1,127 @@
+
+Region 1 (14 cities):
+
+	Albany NY
+	Baltimore MD
+	Boston MA
+	Buffalo NY
+	Burlington VT
+	Concord NH
+	Erie PA
+	MiddletownHarrisburg PA
+	NewYork NY
+	Philadelphia PA
+	Pittsburgh PA
+	RochesterNY NY
+	WashingtonDC DC
+	Worcester MA
+
+Region 2 (15 cities):
+
+	Chattanooga TN
+	Cleveland OH
+	ColumbusOH OH
+	Evansville IN
+	FortWayne IN
+	Indianapolis IN
+	KansasCity MO
+	Lexington KY
+	Memphis TN
+	Moline IL
+	Nashville TN
+	Peoria IL
+	SpringfieldMO MO
+	StLouis MO
+	Toledo OH
+
+Region 3 (11 cities):
+
+	DesMoines IA
+	Detroit MI
+	GrandRapids MI
+	GreenBay WI
+	Lansing MI
+	Madison WI
+	Marquette MI
+	Milwaukee WI
+	Minneapolis MN
+	Saginaw MI
+	SaultSteMarie MI
+
+Region 4 (8 cities):
+
+	Bismarck ND
+	Cheyenne WY
+	Fargo ND
+	Havre MT
+	Huron SD
+	NorthPlatte NE
+	Omaha NE
+	SiouxFalls SD
+
+Region 5 (3 cities):
+
+	Boise ID
+	Seattle WA
+	Spokane WA
+
+Region 6 (6 cities):
+
+	Elko NV
+	Eureka CA
+	LosAngeles CA
+	Reno NV
+	SanDiego CA
+	Winnemucca NV
+
+Region 7 (6 cities):
+
+	Albuquerque NM
+	Denver CO
+	GrandJunction CO
+	Phoenix AZ
+	Roswell NM
+	SaltLakeCity UT
+
+Region 8 (16 cities):
+
+	Abilene TX
+	Amarillo TX
+	Concordia KS
+	CorpusChristi TX
+	DallasFortWorth TX
+	DodgeCity KS
+	ElPaso TX
+	FortSmith AR
+	Houston TX
+	LittleRock AR
+	Meridian MS
+	Oklahoma OK
+	SanAntonio TX
+	Shreveport LA
+	Topeka KS
+	Tulsa OK
+
+Region 9 (19 cities):
+
+	Atlanta GA
+	Augusta GA
+	CapeHatteras NC
+	Charlotte NC
+	ColumbiaSC SC
+	Gainesville FL
+	Jacksonville FL
+	KeyWest FL
+	Lynchburg VA
+	Macon GA
+	Miami FL
+	Mobile AL
+	Montgomery AL
+	NorfolkVA VA
+	Pensacola FL
+	Raleigh NC
+	Richmond VA
+	Savannah GA
+	Tampa FL
+
+Found 98 acceptable cities for years 1914 to 2023.

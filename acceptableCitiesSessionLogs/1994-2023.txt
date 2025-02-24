@@ -1,0 +1,196 @@
+
+Region 1 (18 cities):
+
+	Albany NY
+	Baltimore MD
+	Boston MA
+	Buffalo NY
+	Burlington VT
+	Concord NH
+	Erie PA
+	GlensFalls NY
+	MiddletownHarrisburg PA
+	NewYork NY
+	Philadelphia PA
+	Pittsburgh PA
+	PortlandME ME
+	RochesterNY NY
+	WashingtonDC DC
+	Williamsport PA
+	Wilmington DE
+	Worcester MA
+
+Region 2 (26 cities):
+
+	Beckley WV
+	Bluefield WV
+	Charleston WV
+	Chattanooga TN
+	Chicago IL
+	Cincinnati OH
+	Cleveland OH
+	ColumbusOH OH
+	Dayton OH
+	Evansville IN
+	FortWayne IN
+	Huntington WV
+	Indianapolis IN
+	KansasCity MO
+	Lexington KY
+	Memphis TN
+	Moline IL
+	Nashville TN
+	Peoria IL
+	Rockford IL
+	SouthBend IN
+	Springfield IL
+	SpringfieldMO MO
+	StLouis MO
+	Toledo OH
+	Zaneville OH
+
+Region 3 (23 cities):
+
+	Ashland WI
+	CedarRapids IA
+	DesMoines IA
+	Detroit MI
+	Dubuque IA
+	Duluth MN
+	EauClaire WI
+	GrandRapids MI
+	GreenBay WI
+	LaCrosse WI
+	Lansing MI
+	Madison WI
+	Marquette MI
+	Milwaukee WI
+	Minneapolis MN
+	Muskegon MI
+	RochesterMN MN
+	Saginaw MI
+	SaintCloud MN
+	SaultSteMarie MI
+	Spencer IA
+	Waterloo IA
+	Wausau WI
+
+Region 4 (18 cities):
+
+	Aberdeen SD
+	Bismarck ND
+	Cheyenne WY
+	Fargo ND
+	Glasgow MT
+	GrandIsland NE
+	GreatFalls MT
+	Hastings NE
+	Havre MT
+	Huron SD
+	Lincoln NE
+	McCook NE
+	Missoula MT
+	NorfolkNE NE
+	NorthPlatte NE
+	Omaha NE
+	Scottsbluff NE
+	SiouxFalls SD
+
+Region 5 (9 cities):
+
+	Astoria OR
+	Boise ID
+	EUGENE OR
+	Lewiston ID
+	Pendleton OR
+	Salem OR
+	Seattle WA
+	Spokane WA
+	TriCities WA
+
+Region 6 (10 cities):
+
+	CrescentCity CA
+	Elko NV
+	Ely NV
+	Eureka CA
+	LosAngeles CA
+	Redding CA
+	Reno NV
+	Sacramento CA
+	SanDiego CA
+	Winnemucca NV
+
+Region 7 (9 cities):
+
+	Albuquerque NM
+	ColoradoSprings CO
+	Denver CO
+	GrandJunction CO
+	Phoenix AZ
+	Pueblo CO
+	Roswell NM
+	SaltLakeCity UT
+	Tucson AZ
+
+Region 8 (27 cities):
+
+	Abilene TX
+	Amarillo TX
+	Austin TX
+	BatonRouge LA
+	CollegeStation TX
+	Concordia KS
+	CorpusChristi TX
+	DallasFortWorth TX
+	DodgeCity KS
+	ElPaso TX
+	FortSmith AR
+	Goodland KS
+	Harrison AR
+	Hattiesburg MS
+	Houston TX
+	Jackson MS
+	LakeCharles LA
+	LittleRock AR
+	Meridian MS
+	Monroe LA
+	Oklahoma OK
+	PineBluff AR
+	Russellville AR
+	SanAntonio TX
+	Shreveport LA
+	Topeka KS
+	Tulsa OK
+
+Region 9 (27 cities):
+
+	Asheville NC
+	Athens GA
+	Atlanta GA
+	Augusta GA
+	Birmingham AL
+	CapeHatteras NC
+	Charlotte NC
+	ColumbiaSC SC
+	ColumbusGA GA
+	Gainesville FL
+	GreenvilleSpartanburg SC
+	Jacksonville FL
+	KeyWest FL
+	Lynchburg VA
+	Macon GA
+	Miami FL
+	Mobile AL
+	Montgomery AL
+	NorfolkVA VA
+	Orlando FL
+	Pensacola FL
+	Raleigh NC
+	Richmond VA
+	Savannah GA
+	Tallahassee FL
+	Tampa FL
+	WestPalmBeach FL
+
+Found 167 acceptable cities for years 1994 to 2023.

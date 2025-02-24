@@ -1,0 +1,52 @@
+
+Region 1 (9 cities):
+
+	Albany NY
+	Baltimore MD
+	Boston MA
+	Buffalo NY
+	Concord NH
+	Erie PA
+	NewYork NY
+	Philadelphia PA
+	WashingtonDC DC
+
+Region 2 (3 cities):
+
+	Cleveland OH
+	Indianapolis IN
+	Moline IL
+
+Region 3 (5 cities):
+
+	Detroit MI
+	Lansing MI
+	Madison WI
+	Milwaukee WI
+	Minneapolis MN
+
+Region 4 (1 cities):
+
+	Omaha NE
+
+Region 5 (0 cities):
+
+
+Region 6 (0 cities):
+
+
+Region 7 (1 cities):
+
+	Denver CO
+
+Region 8 (0 cities):
+
+
+Region 9 (4 cities):
+
+	Jacksonville FL
+	Mobile AL
+	Montgomery AL
+	NorfolkVA VA
+
+Found 23 acceptable cities for years 1874 to 2023.
