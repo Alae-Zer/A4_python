@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>A4 - Visualizing Big Data Sets</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            html {
+                font-size: 100%;
+            }
+
+            #content {
+                font-family: "Source Sans 3", serif;
+                font-size: 1rem;
+                line-height: 1.2;
+                width: 95%;
+                margin: auto;
+                color: #333;
+            }
+
+            h1,
+            h2,
+            h3,
+            h4 {
+                font-family: "Montserrat", sans-serif;
+            }
+
+            h1,
+            h2 {
+                font-weight: normal;
+            }
+
+            h1 {
+                color: #ff6600;
+            }
+
+            h2 {
+                color: #003366;
+                border-bottom: solid thin #cccc99;
+                margin-top: 2.5rem;
+            }
+
+            h3 {
+                color: steelblue;
+                font-style: italic;
+            }
+
+            code {
+                background-color: #e6e6e6;
+                padding: 5px;
+            }
+
+            @media screen and (min-width: 768px) {
+                #content {
+                    font-size: 1.25rem;
+                    line-height: 1.5;
+                    width: 85%;
+                }
+            }
+
+            @media screen and (min-width: 1400px) {
+                #content {
+                    font-size: 1.4rem;
+                    line-height: 1.6;
+                    width: 75%;
+                }
+            }
+
+            aside {
+                font-size: 0.9em;
+                font-style: italic;
+            }
+
+            #missingDataExample {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+            #missingDataExample > div {
+                border: solid thin gray;
+                padding: 10px;
+            }
+
+            #missingDataExample > div:last-child {
+                background-color: #eee;
+            }
+
+            .function {
+                font-style: italic;
+            }
+
+            .equation {
+                font-family: monospace;
+                background-color: #dfdfaf;
+                padding: 0.25rem 0.5rem;
+            }
+
+            #acknowledgements {
+                width: 35%;
+                background-color: beige;
+                border: dashed thin brown;
+                padding: 10px;
+                margin-left: 20px;
+                float: right;
+            }
+
+            footer {
+                margin-top: 2rem;
+                background-color: #ddd;
+                font-size: 85%;
+                font-style: italic;
+                padding: 0.5rem;
+                display: flex;
+                justify-content: space-between;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="content">
+            <h1>A4 - Visualizing Big Data Sets</h1>
+
+            <aside>
+                Work on this assignment in groups of up to 3 students.
+            </aside>
+
+            <h2>Overview</h2>
+
+            <ul>
+                <li>
+                    In this assignment, you will learn to work with a very large
+                    dataset. You will first clean and verify the data and then
+                    visualize various aspects by creating charts.
+                </li>
+                <li>
+                    In the next assignment, you will learn a method for
+                    analyzing the data and visualizing trends.
+                </li>
+            </ul>
+
+            <h2>Background</h2>
+
+            <aside id="acknowledgements">
+                <p>
+                    The dataset is courtesy of Yuchuan Lai at Carnegie Mellon
+                    University.
+                </p>
+                <p>
+                    Note: The file "city_info.csv" is a modified version of the
+                    dataset's original directory file. You can still see the
+                    original if you wish - it has been renamed to
+                    "city_info_original.csv" - but we won't be using it in this
+                    assignment.
+                </p>
+            </aside>
+
+            <ul>
+                <li>
+                    You are given a dataset containing daily high and low
+                    temperatures for 210 U.S. cities, dating back to the late
+                    1800s, and ending in 2023.
+                </li>
+                <li>
+                    Note that the temperatures are in Fahrenheit, not Celsius.
+                </li>
+
+                <li>Each city's data is in its own file.</li>
+                <li>
+                    The file "city_info.csv" is a directory where you can find
+                    the file matching each city, the region to which the city
+                    belongs, as well as the date range of the temperature
+                    information for that city.
+                </li>
+            </ul>
+
+            <h3>Regions</h3>
+
+            <p>
+                The cities are assigned to nine different regions. In the
+                "regional" folder, you'll find directory files that tell you
+                which states belong to which regions.
+            </p>
+
+            <img src="US_Regions_Annotated.png" alt="region map" />
+
+            <h3>Missing Data</h3>
+
+            <ul>
+                <li>
+                    In large datasets, it is common for some data to be missing,
+                    and we must decide how to deal with it.
+                </li>
+                <li>
+                    Fortunately, all dates are present from the starting date to
+                    the ending date in this dataset. So, we don't have to worry
+                    about missing dates.
+                </li>
+                <li>
+                    However, some of the dates are missing either the high
+                    temperature, or the low temperature, or both. (These data
+                    points are recorded as "NA".)
+                    <ul>
+                        <li>
+                            For some cities, only a few dates have missing
+                            temperatures, but for other cities, there are large
+                            ranges of dates with missing data. (For example, the
+                            data for Huntsville AL is missing both the high and
+                            the low for all dates from 1959 - 2017!)
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Our overall strategy is to fill in missing data by taking
+                    the average of the nearest preceding point and the nearest
+                    following point.
+                    <ul>
+                        <li>
+                            We consider a record to be unusable if it is missing
+                            the high or low temperature (or both) for a certain
+                            date <strong>AND</strong>
+                            <ol>
+                                <li>
+                                    there is no record in the ten days preceding
+                                    that contains the data point;
+                                    <strong>OR</strong>
+                                </li>
+                                <li>
+                                    there is no record in the ten days following
+                                    that contains the data point.
+                                </li>
+                            </ol>
+                            <p>
+                                In other words, if a data point is missing,
+                                there must be a data point BOTH in the previous
+                                ten days prior AND in the following ten days.
+                            </p>
+                        </li>
+                        <li>
+                            We consider a city to be unacceptable if it contains
+                            any unusable record(s) for the date range we are
+                            interested in.
+                        </li>
+                        <li>
+                            For acceptable cities where either the high or the
+                            low is missing, we will fill in the missing
+                            temperature by averaging the closest earlier
+                            temperature and the closest later temperature.
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h4>Examples of Filling in Missing Temperatures</h4>
+
+            <div id="missingDataExample">
+                <div>
+                    <ul>
+                        <li>
+                            The records for 1928-01-13, 1928-01-14, and
+                            1928-01-15 are all usuable.
+                        </li>
+                        <li>
+                            The record for 1928-01-13 is missing the low
+                            temperature. To fill it in, we take the closest
+                            preceding low (37) and the closest following low
+                            (-3) and average them to get 17 ((37-3)/2).
+                        </li>
+                        <li>
+                            The record for 1928-01-14 is missing both the high
+                            and the low. The high will become (38+21)/2 = 29.5,
+                            and the low will become (37-3)/2 = 17.
+                        </li>
+                        <li>
+                            The record for 1928-01-15 is missing the high. The
+                            new high will be 29.5, by the same calculation as
+                            the high for 1928-01-14.
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <pre>
+"12794",1928-01-12,48,37,0
+"12795",1928-01-13,38,NA,0.13
+"12796",1928-01-14,NA,NA,0.02
+"12797",1928-01-15,NA,-3,0.01
+"12798",1928-01-16,21,11,0
+</pre
+                    >
+                </div>
+            </div>
+
+            <h2>Part A - Find Acceptable Cities in a Date Range</h2>
+
+            <ol>
+                <li>
+                    In "a4functions.py", write the function
+                    <span class="function"
+                        >get_acceptable_cities(start_year, end_year)</span
+                    >
+                    The function should return a dictionary mapping the nine
+                    regions to sorted lists of acceptable cities in that region.
+                </li>
+                <li>
+                    With your submission, include a session log that shows
+                    testing of this function.
+                </li>
+            </ol>
+
+            <h3>Some Expected Counts</h3>
+
+            <p>
+                For each of the following, you are given a text file containing
+                the detailed breakdown of cities in regions.
+            </p>
+            <ul>
+                <li>
+                    get_acceptable_cities(1874, 2023) should yield 23 cities.
+                </li>
+                <li>
+                    get_acceptable_cities(1914, 2023) should yield 98 cities.
+                </li>
+                <li>
+                    get_acceptable_cities(1954, 2023) should yield 150 cities.
+                </li>
+                <li>
+                    get_acceptable_cities(1994, 2023) should yield 167 cities.
+                </li>
+            </ul>
+
+            <h2>
+                Part B - Create Regional Files for a Set of Cities and a Date
+                Range
+            </h2>
+
+            <ol>
+                <li>
+                    Decide on a timeframe for your dataset for the remainder of
+                    the assignment. (In the samples, I have used 1904 - 2023.)
+                    Your timeframe should be at least 50 years.
+                </li>
+                <li>
+                    From each of the nine regions, choose three acceptable
+                    cities, for a total of 27 cities. (Note: if there are fewer
+                    than three acceptable cities in any region, you'll need to
+                    choose a different timeframe.)
+                </li>
+                <li>
+                    In "a4functions.py", write the function
+                    <span class="function"
+                        >create_regional_file(cities, start_year, end_year,
+                        file_name)</span
+                    >
+
+                    This function does several things:
+                    <ul>
+                        <li>
+                            For each date in the range, it averages the high
+                            temperatures for three cities (in a single region)
+                            to get an average high; and ditto for the low
+                            temperature.
+                            <ul>
+                                <li>
+                                    For records where the high or the low is
+                                    missing, fill in the missing data as
+                                    described in the Background section above.
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li>
+                            It then averages the high and low averages to get a
+                            single daily mean temperature for each date.
+                        </li>
+                        <li>
+                            It converts the daily temperature from Fahrenheit to
+                            Celsius.
+                        </li>
+                        <li>
+                            It writes the data to a new file, with the
+                            temperatures stored with one decimal place of
+                            precision.
+                            <ul>
+                                <li>
+                                    The first line of the output file should be
+                                    the column headers "Date,Temperature".
+                                </li>
+
+                                <li>
+                                    Make sure the dates are in YYYY-MM-DD format
+                                    (as in the source files).
+                                </li>
+                                <li>
+                                    Make sure there are no leading or trailing
+                                    spaces in any of the data points.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+
+                <li>
+                    Write a script, called "create_regional_files.py", that uses
+                    your
+                    <span class="function">create_regional_file</span> function
+                    to create a file for each region. The time span should be at
+                    least 50 years. (Note that you can use the function
+                    <span class="function">get_acceptable_cities</span> to find
+                    suitable cities.)
+                </li>
+            </ol>
+
+            <h2>Part C - Consolidate the Regional Files</h2>
+
+            <ol>
+                <li>
+                    In "a4functions.py", write a function called
+                    <span class="function">consolidate_regions</span>. This
+                    function should consolidate the nine regional files (created
+                    in Part B) into a single file.
+                    <ul>
+                        <li>
+                            The first line of the new file should be the column
+                            headers "Region,Date,Temperature".
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Run this function however you wish. (You may run it in
+                    interactive mode, or write a script to call it, or call it
+                    from "create_regional_files.py" after the regional files
+                    have been created.)
+                </li>
+                <li>
+                    Write a script, called "check_consolidated_file.py" to prove
+                    that your data set is complete. The number of lines in the
+                    file, excluding the header line, should be
+                    <span class="equation"
+                        >((365*Y<sub>N</sub>) + (366*Y<sub>L</sub>)) * 9</span
+                    >, where Y<sub>N</sub> is the number of normal years, and
+                    Y<sub>L</sub> is the number of leap years. (The multiplier 9
+                    comes from the fact that there are 9 regions.)
+                </li>
+                <li>
+                    Hand in your source code, a sample file, and a screen
+                    capture of running "check_consolidated_file.py" proving that
+                    the file is complete.
+                </li>
+            </ol>
+
+            <h2>Part D - Create a Helper Class</h2>
+
+            <ol>
+                <li>
+                    To make the data easier to work with, create a helper class,
+                    called TemperatureHelper, that:
+                    <ul>
+                        <li>
+                            loads the data from a consolidated file (created in
+                            Part C) when an instance is constructed
+                        </li>
+                        <li>separates the dates into year, month, and day</li>
+                        <li>
+                            stores the data as nested dictionaries, where:
+                            <ul>
+                                <li>
+                                    the region name is the key for level 1, and
+                                    the value is a dictionary of years
+                                </li>
+                                <li>
+                                    the year is the key for level 2, and the
+                                    value is a dictionary of months
+                                </li>
+                                <li>
+                                    the month is the key for level 3, and the
+                                    value is a dictionary of days
+                                </li>
+                                <li>
+                                    the day is the key for level 4, and the
+                                    value is the temperature.
+                                </li>
+                            </ul>
+                            <h4>Example</h4>
+                            <p>
+                                If a consolidated file contains data for the
+                                nine regions for all dates from 1990 to 1999,
+                                and if the helper class stores this in a field
+                                called
+                                <code>data</code>, then:
+                            </p>
+                            <blockquote>
+                                <p>
+                                    <code>data</code> is a dictionary with
+                                    region names as keys
+                                </p>
+                                <p>
+                                    <code>data['Region2']</code> is a dictionary
+                                    with years as keys
+                                </p>
+                                <p>
+                                    <code>data['Region2'][1995]</code> is a
+                                    dictionary with months as keys
+                                </p>
+                                <p>
+                                    <code>data['Region2'][1995][2]</code> is a
+                                    dictionary with days as keys
+                                </p>
+                                <p>
+                                    <code>data['Region2'][1995][2][28]</code> is
+                                    a the daily temperature
+                                </p>
+                            </blockquote>
+                        </li>
+
+                        <li>
+                            Provides a method,
+                            <span class="function"
+                                >get_daily_temperature(region, year, month,
+                                day)</span
+                            >. This method returns the temperature for the
+                            specified region and date.
+                        </li>
+                        <li>
+                            Provides a method,
+                            <span class="function"
+                                >get_yearly_temperatures(region, year)</span
+                            >. This method returns a numpy array containing the
+                            temperatures for the specified region for each day
+                            of the specified year.
+                            <ul>
+                                <li>You will have to import numpy.</li>
+                                <li>
+                                    A NumPy array is similar to a list, but it's
+                                    easier to perform mathematical operations on
+                                    it. We'll use it later.
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Write a script, called "try_TemperatureHelper.py", that
+                    creates an instance of TemperatureHelper using the
+                    consolidated file that you created in Part C and tests the
+                    two functions with a few different calls each.
+                </li>
+                <li>
+                    Hand in your source code, your test script, and a screen
+                    capture showing the testing.
+                </li>
+            </ol>
+
+            <h2>Part E - Create Charts</h2>
+
+            <ol type="1">
+                <li>
+                    Learn to use Matplotlib (see the demos and the
+                    <a href="https://matplotlib.org/">Matplotlib Website</a>)
+                    and write the following functions in "a4functions.py". (See
+                    the code documentation for details.)
+                    <ul>
+                        <li>
+                            <span class="function"
+                                >annual_means_per_region(regions, years,
+                                consolidatedFile)</span
+                            >
+                        </li>
+                        <li>
+                            <span class="function"
+                                >annual_means_combined(regions, years, patterns,
+                                consolidatedFile)</span
+                            >
+                        </li>
+                        <li>
+                            <span class="function"
+                                >single_day_per_region(regions, years, month,
+                                day, consolidatedFile)</span
+                            >
+                        </li>
+                        <li>
+                            <span class="function"
+                                >single_day_combined(regions, years, month, day,
+                                patterns, consolidatedFile)</span
+                            >
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    Choose four days spaced well throughout the year (e.g., Feb
+                    3, May 6, Aug 9, Nov 12). Write a script, called
+                    "create_charts.py", that uses the functions you wrote in
+                    step 1 and the consolidated file from Part C to create 50
+                    charts (PNG files) showing:
+                    <ol type="a">
+                        <li>
+                            the temperatures on day1 of each year for each
+                            region (nine charts). Name these files "[day1 -
+                            cityN].png". For example, if day1 is Feb 3, then the
+                            file names should be:
+                            <ul>
+                                <li>Feb 3 - Region1.png</li>
+                                <li>Feb 3 - Region2.png</li>
+                                <li>Feb 3 - Region3.png</li>
+                                <li>Feb 3 - Region4.png</li>
+                                <li>Feb 3 - Region5.png</li>
+                                <li>Feb 3 - Region6.png</li>
+                                <li>Feb 3 - Region7.png</li>
+                                <li>Feb 3 - Region8.png</li>
+                                <li>Feb 3 - Region9.png</li>
+                            </ul>
+                        </li>
+                        <li>
+                            the temperatures on day2 of each year for each
+                            region (nine charts)
+                        </li>
+                        <li>
+                            the temperatures on day3 of each year for each
+                            region (nine charts)
+                        </li>
+                        <li>
+                            the temperatures on day4 of each year for each
+                            region (nine charts)
+                        </li>
+                        <li>
+                            the temperatures on day1 of each year for all
+                            regions, as nine series on a single chart. Name this
+                            file "[day1] - All Cities.png". For example, if day1
+                            is Feb 3, then the name is "Feb 3 - All Regions.png"
+                        </li>
+                        <li>
+                            the temperatures on day2 of each year for all
+                            regions on a single chart
+                        </li>
+                        <li>
+                            the temperatures on day3 of each year for all
+                            regions on a single chart
+                        </li>
+                        <li>
+                            the temperatures on day4 of each year for all
+                            regions on a single chart
+                        </li>
+                        <li>
+                            the annual means per city, one chart per region
+                            (nine charts). Name these files "Annual Means -
+                            [RegionN].png"
+                        </li>
+                        <li>
+                            the annual means of all regions as nine series on a
+                            single chart. Name this file "Annual Means - All
+                            Regions.png"
+                        </li>
+                    </ol>
+                </li>
+                <li>Hand in your source code and your 50 charts.</li>
+            </ol>
+
+            <h2>Submission Checklist</h2>
+
+            <h3>Python Files</h3>
+
+            <ul>
+                <li>
+                    a4functions.py - contains the functions:
+                    <span class="function">
+                        <ul>
+                            <li>get_acceptable_cities</li>
+                            <li>create_regional_file</li>
+                            <li>consolidate_regions</li>
+                            <li>annual_means_per_city</li>
+                            <li>annual_means_combined</li>
+                            <li>single_day_per_region</li>
+                            <li>single_day_combined</li>
+                        </ul>
+                    </span>
+                </li>
+
+                <li>create_regional_files.py</li>
+                <li>check_consolidated_file.py</li>
+                <li>TemperatureHelper.py (class)</li>
+                <li>try_TemperatureHelper.py</li>
+                <li>create_charts.py</li>
+            </ul>
+
+            <h3>Logs and Screen Shots</h3>
+
+            <ul>
+                <li>Session log of testing get_acceptable_cities</li>
+                <li>Running the script "check_consolidated_file.py"</li>
+                <li>Running the script "try_TemperatureHelper.py"</li>
+            </ul>
+
+            <h3>Artifacts</h3>
+
+            <ul>
+                <li>Sample file created by "create_consolidated_file.py"</li>
+                <li>50 images created by "create_charts.py"</li>
+            </ul>
+
+            <footer>
+                <div>Assignment 4 - Big Data Sets</div>
+                <div>Alternative Solutions (Winter 2025)</div>
+            </footer>
+        </div>
+    </body>
+</html>
