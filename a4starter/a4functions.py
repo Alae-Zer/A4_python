@@ -24,131 +24,97 @@ MONTH_NAMES = [
 
 
 def get_acceptable_cities(startYear, endYear):
-    """Gets a sorted list of cities that are acceptable for the specified timeframe.
-
-    A city is acceptable if it is acceptable for every year in the timeframe.
-    A city is acceptable for a year if there are no gaps of more than ten days between valid data points.
-    """
-    res = dict()
-    
-    #Track counts
-    totalCities = 0
-    acceptedCities = 0
-
-    #FILE STRUCTURE -- Region,City,State,Lat,Lon,FileName,StartDate,EndDate
-    try:
-        if(readIntoList(DIRECTORY)):
-            inputFileContest = readIntoList(DIRECTORY)
-            for line in inputFileContest:
-                
-                tokens = line.split(",")
-                
-                #WE UNDERSTAND THAT IT IS SILLY, BUT REMOVES THE FIRST ROW IF HEADERS ARE AVAILABLE, ELSE TRYING TO COLLECT
-                if(tokens[0] == "Region" and tokens[1] == "City"):
-                    continue
-                
-                region = tokens[0]
-                city = tokens[1]
-                state = tokens[2]
-                fileName = tokens[5]
-                totalCities += 1
-                
-                try:
-                    #FILE STRUCTURE -- "","Date","tmax","tmin","prcp"
-                    cityFileReadings = DATA_PATH + "/" + fileName
-                    inputCityContest = readIntoList(cityFileReadings)
-                    
-                    #Store valid dates for each year
-                    validDatesByYear = {}
-                    
-                    #Populate Years based On Range Value
-                    for year in range(startYear, (endYear + 1)):
-                        validDatesByYear[year] = []
-                    
-                    for lineCity in inputCityContest:
-                        cityTokens = lineCity.split(",")
-
-                        #Skip Line If not enough args, NOT REQUIRED BUT JUST IN CASE
-                        if len(cityTokens) != 5:
-                            continue
-
-                        date = cityTokens[1]
-                        maxTemperature = cityTokens[2]
-                        minTemperature = cityTokens[3]
-
-                        #Skip Header or incorrect date line
-                        if((date == '"Date"' and maxTemperature == '"tmax"') or (maxTemperature == "NA" or minTemperature == "NA")):
-                            continue
-                            
-                        dateTokens = date.split("-")
-                        year = int(dateTokens[0])
-                        month = int(dateTokens[1])
-                        day = int(dateTokens[2])
-                        
-                        # Only add if year is in our range
-                        if year >= startYear and year <= endYear:
-                            validDatesByYear[year].append(datetime.date(year, month, day))
-                    
-                    #Flag to
-                    cityAcceptable = True
-                    
-                    # Check for gaps in each year
-                    # Check for gaps in each year
-                    for year in range(startYear, endYear + 1):
-                        if len(validDatesByYear[year]) == 0:
-                            cityAcceptable = False
-                            break
-                        
-                        # Check forward gaps
-                        dates = sorted(validDatesByYear[year])
-                        for i in range(1, len(dates)):
-                            gap = (dates[i] - dates[i-1]).days
-                            if gap >= 10:
-                                cityAcceptable = False
-                                break
-                        
-                        # Check backward gaps (descending order)
-                        dates_backward = sorted(validDatesByYear[year], reverse=True)
-                        for i in range(1, len(dates_backward)):
-                            gap = (dates_backward[i-1] - dates_backward[i]).days
-                            if gap >= 10:
-                                cityAcceptable = False
-                                break
-                        
-                        if not cityAcceptable:
-                            break
-                    
-                    if cityAcceptable:
-                        regionNum = int(region)
-                        if regionNum not in res:
-                            res[regionNum] = []
-                        res[regionNum].append(f"{city} {state}")
-                        acceptedCities += 1
-                except:
-                    print(f"Unable to read {cityFileReadings}")
-                    continue
-        else:
-            raise FileNotFoundError()
-    except:
-        print("Error reading city information file")
-    
-    #Sort cities in each region
-    for region in res:
-        res[region].sort()
-    
-    #Print results
-    totalAccepted = 0
-    for region in sorted(res.keys()):
-        citiesInRegion = len(res[region])
-        totalAccepted += citiesInRegion
-        print(f"Region {region} ({citiesInRegion} cities):\n")
-        for city in res[region]:
-            print(f"\t{city}")
-        print()
-    
-    print(f"Found {totalAccepted} acceptable cities for years {startYear} to {endYear}.")
-    
-    return res
+   res = dict()
+   totalCities = 0
+   acceptedCities = 0
+   
+   try:
+       if(readIntoList(DIRECTORY)):
+           inputFileContest = readIntoList(DIRECTORY)
+           for line in inputFileContest:
+               tokens = line.split(",")
+               
+               if(tokens[0] == "Region" and tokens[1] == "City"):
+                   continue
+               
+               region = tokens[0]
+               city = tokens[1]
+               state = tokens[2]
+               fileName = tokens[5]
+               startDate = tokens[6]
+               
+               # Skip cities that start after our range
+               startYear_city = int(startDate.split("-")[0])
+               if startYear_city > startYear:
+                   continue
+                   
+               totalCities += 1
+               
+               try:
+                   cityFileReadings = DATA_PATH + "/" + fileName
+                   inputCityContest = readIntoList(cityFileReadings)
+                   
+                   consecutiveNACount = 0
+                   cityIsGood = False
+                   validReadingsInRange = 0
+                   MINIMUM_VALID_READINGS = 1
+                   
+                   for lineCity in inputCityContest:
+                       cityTokens = lineCity.split(",")
+                       
+                       date = cityTokens[1]
+                       maxTemperature = cityTokens[2]
+                       minTemperature = cityTokens[3]
+                       
+                       if(date == '"Date"' and maxTemperature == '"tmax"' and minTemperature == '"tmin"'):
+                           continue
+                       
+                       dateTokens = date.split("-")
+                       year = int(dateTokens[0])
+                       month = int(dateTokens[1])
+                       day = int(dateTokens[2])
+                       
+                       if (year >= startYear and year <= endYear):
+                           if (maxTemperature == "NA" or minTemperature == "NA"):
+                               consecutiveNACount += 1
+                               if consecutiveNACount >= 10:
+                                   break
+                           else:
+                               consecutiveNACount = 0
+                               validReadingsInRange += 1
+                               if validReadingsInRange >= MINIMUM_VALID_READINGS:
+                                   cityIsGood = True
+                   
+                   if cityIsGood and consecutiveNACount < 10:
+                       regionNum = int(region)
+                       if regionNum not in res:
+                           res[regionNum] = []
+                       res[regionNum].append(f"{city} {state}")
+                       acceptedCities += 1
+               
+               except:
+                   print(f"Unable to read {cityFileReadings}")
+                   continue
+       else:
+           raise FileNotFoundError()
+   except:
+       print("Error reading city information file")
+   
+   for region in res:
+       res[region].sort()
+   
+   totalAccepted = 0
+   for region in sorted(res.keys()):
+       citiesInRegion = len(res[region])
+       totalAccepted += citiesInRegion
+       print(f"Region {region} ({citiesInRegion} cities):\n")
+       for city in res[region]:
+           print(f"\t{city}")
+       print()
+   
+   print(f"Found {totalAccepted} acceptable cities for years {startYear} to {endYear}.")
+   
+   return res
 
 
 def create_regional_file(cities, startYear, endYear, outputFileName):
