@@ -9,7 +9,7 @@ def readIntoList(filename):
     Returns:
        list: a list of strings, one line per element
     """
-    fin = open(filename)
+    fin = open(filename, "r")
     lines = []
     for line in fin:
         lines.append(line.strip("\n"))
