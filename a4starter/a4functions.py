@@ -264,24 +264,13 @@ def get_three_random_cities_per_region(startYear, endYear):
     return outputSelected
 
 def create_regional_file(cities, startYear, endYear, outputFileName):
-    """
-    For each date in the range, calculate a single temperature as follows:
-    1. Find the average high of the three input cities.
-    2. Find the average low of the three input cities.
-    (Missing data points for min and max are filled in from surrounding dates.)
-    3. Average the average high and the average low to get a single daily temperature.
-    4. Convert the daily temperature to Celsius.
-    5. Create a file containing the daily temperatures for each day in the range.
-       Store the Celsius temperatures to one decimal place of precision.
-    """
     try:
-        # Find the file paths for the selected cities
         inputCities = readIntoList(DIRECTORY)
         cityFiles = {}
         
         for cityLine in inputCities:
             tokens = cityLine.split(",")
-            if len(tokens) < 6 or tokens[0] == "Region":  # Skip header or invalid lines
+            if tokens[0] == "Region":
                 continue
                 
             fileName = tokens[5]
@@ -293,16 +282,14 @@ def create_regional_file(cities, startYear, endYear, outputFileName):
                 filePath = DATA_PATH + "/" + fileName
                 cityFiles[cityFullName] = filePath
         
-        # Process city files to get temperature data with filled in missing values
         cityData = {}
         for city, filePath in cityFiles.items():
             processedData = process_temperature_file(filePath)
             
-            # Convert processed data into a dictionary indexed by date
             dateDict = {}
             for line in processedData:
                 tokens = line.split(',')
-                if len(tokens) >= 3 and tokens[0] != "Station":  # Skip header
+                if len(tokens) >= 3 and tokens[0]:
                     date = tokens[0].strip('"')
                     tmax = tokens[1]
                     tmin = tokens[2]
@@ -310,54 +297,45 @@ def create_regional_file(cities, startYear, endYear, outputFileName):
             
             cityData[city] = dateDict
         
-        # Generate all dates in the range
-        all_dates = []
+        allDates = []
         for year in range(startYear, endYear + 1):
             for month in range(1, 13):
-                days_in_month = 31
+                daysInMonth = 31
                 if month in [4, 6, 9, 11]:
-                    days_in_month = 30
+                    daysInMonth = 30
                 elif month == 2:
-                    # Check for leap year
                     if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):
-                        days_in_month = 29
+                        daysInMonth = 29
                     else:
-                        days_in_month = 28
+                        daysInMonth = 28
                 
-                for day in range(1, days_in_month + 1):
-                    date_str = f"{year}-{month:02d}-{day:02d}"
-                    all_dates.append(date_str)
+                for day in range(1, daysInMonth + 1):
+                    dateStr = f"{year}-{month:02d}-{day:02d}"
+                    allDates.append(dateStr)
         
-        # Calculate daily regional temperatures
-        outputLines = ["Date,Temperature"]  # Header line
+        outputLines = ["Date,Temperature"]
         
-        for date in all_dates:
-            tmax_sum = 0
-            tmin_sum = 0
-            valid_cities = 0
+        for date in allDates:
+            tmaxSum = 0
+            tminSum = 0
+            validCities = 0
             
-            # Get data for this date from each city
             for city, data in cityData.items():
                 if date in data:
-                    tmax_sum += data[date]["tmax"]
-                    tmin_sum += data[date]["tmin"]
-                    valid_cities += 1
+                    tmaxSum += data[date]["tmax"]
+                    tminSum += data[date]["tmin"]
+                    validCities += 1
             
-            # If we have data for at least one city
-            if valid_cities > 0:
-                avg_high = tmax_sum / valid_cities
-                avg_low = tmin_sum / valid_cities
+            if validCities > 0:
+                avgHigh = tmaxSum / validCities
+                avgLow = tminSum / validCities
                 
-                # Calculate daily mean temperature in Fahrenheit
-                daily_avg_f = (avg_high + avg_low) / 2
+                dailyAvgF = (avgHigh + avgLow) / 2
                 
-                # Convert to Celsius
-                daily_avg_c = (daily_avg_f - 32) * 5/9
+                dailyAvgC = (dailyAvgF - 32) * 5/9
                 
-                # Format with one decimal place
-                outputLines.append(f"{date},{daily_avg_c:.1f}")
+                outputLines.append(f"{date},{dailyAvgC:.1f}")
         
-        # Write output file
         writeListToFile(outputLines, outputFileName)
         
         return True
@@ -367,9 +345,10 @@ def create_regional_file(cities, startYear, endYear, outputFileName):
         raise
 
 
-def consolidate_regions(file_name):
+def consolidate_regions(fileName):
     try:
         consolidatedLines = ["Region,Date,Temperature"]
+        fileName = f"./data/outputs/{fileName}.csv"
         
         for region in range(1, 10):
             regionFile = f"./data/outputs/{region}region.csv"
@@ -383,7 +362,7 @@ def consolidate_regions(file_name):
 
                     if line == consolidatedLines[0]:
                         continue
-                    
+
                     parts = line.split(',')
                     if len(parts) == 2:
                         date = parts[0]
@@ -394,7 +373,8 @@ def consolidate_regions(file_name):
                 print(f"Warning: Could not find region file {regionFile}")
                 continue
         
-        writeListToFile(consolidatedLines, file_name)
+        writeListToFile(consolidatedLines, fileName)
+        print(f"Regions consolidated to {fileName}")
         return True
         
     except Exception as e:
@@ -457,6 +437,9 @@ if __name__ == "__main__":
                 create_regional_file(cities,startYear,endYear,outPutfile)
         except ValueError:
             print("Error: Start year and end year must be integers")
+    elif len(sys.argv) == 2:
+        fileName = sys.argv[1]
+        consolidate_regions(fileName)
     else:
         print("Usage: python a4functions.py <start_year> <end_year>")
         print("Example: python a4functions.py 1994 2023")
