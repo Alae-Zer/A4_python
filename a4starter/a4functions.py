@@ -35,6 +35,7 @@ def process_temperature_file(filename):
         
     outputData = []
     
+    #Loop through each line in the file and extract data
     for line in lines:
         tokens = line.split(",")
         date = tokens[1]
@@ -45,16 +46,19 @@ def process_temperature_file(filename):
                 
         outputData.append({"Date": date, "tmax": tmax, "tmin": tmin})
     
+    #Find positions with valid tmax values
     validTmaxPositions = []
     for i in range(len(outputData)):
         if outputData[i]["tmax"] != "NA":
             validTmaxPositions.append(i)
     
+    #Fill in missing tmax values
     for i in range(len(outputData)):
         if outputData[i]["tmax"] == "NA":
             prevPos = -1
             nextPos = -1
             
+            #Find previous and next valid positions
             for pos in validTmaxPositions:
                 if pos < i:
                     prevPos = pos
@@ -62,6 +66,7 @@ def process_temperature_file(filename):
                     nextPos = pos
                     break
 
+            #Interpolate missing values
             if prevPos != -1 and nextPos != -1:
                 prevVal = float(outputData[prevPos]["tmax"])
                 nextVal = float(outputData[nextPos]["tmax"])
@@ -72,16 +77,19 @@ def process_temperature_file(filename):
                 outputData[i]["tmax"] = outputData[nextPos]["tmax"]
     
 
+    #Find positions with valid tmin values
     validTminPositions = []
     for i in range(len(outputData)):
         if outputData[i]["tmin"] != "NA":
             validTminPositions.append(i)
     
+    #Fill in missing tmin values
     for i in range(len(outputData)):
         if outputData[i]["tmin"] == "NA":
             prevPos = -1
             nextPos = -1
             
+            #Find previous and next valid positions
             for pos in validTminPositions:
                 if pos < i:
                     prevPos = pos
@@ -89,6 +97,7 @@ def process_temperature_file(filename):
                     nextPos = pos
                     break
             
+            #Interpolate missing values with proper formatting
             if prevPos != -1 and nextPos != -1:
                 prevVal = float(outputData[prevPos]["tmin"])
                 nextVal = float(outputData[nextPos]["tmin"])
@@ -101,6 +110,7 @@ def process_temperature_file(filename):
                 value = float(outputData[nextPos]["tmin"])
                 outputData[i]["tmin"] = f"{value:.1f}"
     
+    #Create final formatted results
     resultData = []
     for i in range(len(outputData)):
         resultData.append(f"{outputData[i]['Date']},{outputData[i]['tmax']},{outputData[i]['tmin']}")
@@ -248,12 +258,12 @@ def get_three_random_cities_per_region(startYear, endYear):
         outputSelected[region] = []
         cities = acceptableCities[region]
 
+        #Check if we have enough cities for this region
         if(len(cities) < 3):
             outputSelected = {}
             return outputSelected
-        #print(region)
         
-        #LOOP CITY
+        #LOOP CITY until we get 3 random cities
         while True:
             randomCity = random.choice(cities)
             
@@ -272,6 +282,7 @@ def create_regional_file(cities, startYear, endYear, outputFileName):
         inputCities = readIntoList(DIRECTORY)
         cityFiles = {}
         
+        #Map city names to data files
         for cityLine in inputCities:
             tokens = cityLine.split(",")
 
@@ -290,6 +301,7 @@ def create_regional_file(cities, startYear, endYear, outputFileName):
                 filePath = DATA_PATH + "/" + fileName
                 cityFiles[cityFullName] = filePath
         
+        #Process data for each city and store in dict
         cityData = {}
         for city, filePath in cityFiles.items():
             processedData = process_temperature_file(filePath)
@@ -305,6 +317,7 @@ def create_regional_file(cities, startYear, endYear, outputFileName):
             
             cityData[city] = dateDict
         
+        #Generate all dates in range
         allDates = []
         
         for year in range(startYear, endYear + 1):
@@ -322,6 +335,7 @@ def create_regional_file(cities, startYear, endYear, outputFileName):
                     dateStr = f"{year}-{month:02d}-{day:02d}"
                     allDates.append(dateStr)
         
+        #Prepare output file with temperature averages
         outputLines = ["Date,Temperature"]
         
         for date in allDates:
@@ -329,6 +343,7 @@ def create_regional_file(cities, startYear, endYear, outputFileName):
             tminSum = 0
             validCities = 0
             
+            #Calculate average temperature across cities for this date
             for city, data in cityData.items():
                 if date in data:
                     tmaxSum += data[date]["tmax"]
@@ -339,8 +354,10 @@ def create_regional_file(cities, startYear, endYear, outputFileName):
                 avgHigh = tmaxSum / validCities
                 avgLow = tminSum / validCities
                 
+                #Calculate daily average in Fahrenheit
                 dailyAvgF = (avgHigh + avgLow) / 2
                 
+                #Convert to Celsius
                 dailyAvgC = (dailyAvgF - 32) * 5/9
                 
                 outputLines.append(f"{date},{dailyAvgC:.1f}")
@@ -359,16 +376,18 @@ def consolidate_regions(fileName):
         consolidatedLines = ["Region,Date,Temperature"]
         fileName = f"./data/outputs/{fileName}.csv"
         
+        #Process each region file
         for region in range(1, 10):
             regionFile = f"./data/outputs/{region}region.csv"
             
             try:
                 regionData = readIntoList(regionFile)
                 
+                #Extract data and add region number
                 for i in range(1, len(regionData)):
                     line = regionData[i]
                     
-
+                    #Skip header if found
                     if line == consolidatedLines[0]:
                         continue
 
@@ -382,6 +401,7 @@ def consolidate_regions(fileName):
                 print(f"Warning: Could not find region file {regionFile}")
                 continue
         
+        #Write consolidated data
         writeListToFile(consolidatedLines, fileName)
         print(f"Regions consolidated to {fileName}")
         return True
@@ -391,36 +411,39 @@ def consolidate_regions(fileName):
         return False
 
 
-def annual_means_per_region(regions, years, consolidatedFile, output_dir="./"):
-    
+def annual_means_per_region(regions, years, consolidatedFile):
     plt.rcParams["figure.figsize"] = [10, 6]
     helper = TemperatureHelper.TemperatureHelper(consolidatedFile)
     
+    output_dir = "./data/charts"
+    
+    #Generate chart for each region
     for region in regions:
         regionName = f"Region{region}"
         yearsList = []
         tempsList = []
         
+        #Calculate annual average for each year
         for year in years:
             yearlyTemps = helper.get_yearly_temperatures(regionName, year)
             
-            # Filter out None values
+            #Filter out None values
             validTemps = []
             for temp in yearlyTemps:
                 if temp is not None:
                     validTemps.append(temp)
             
+            #Calculate and store yearly average if data exists
             if len(validTemps) > 0:
-                # Calculate average
                 total = 0
                 for temp in validTemps:
                     total += temp
                 average = total / len(validTemps)
                 
-                # Store results
                 yearsList.append(year)
                 tempsList.append(average)
             
+        #Plot the data if available
         if len(yearsList) > 0:
             plt.figure()
             plt.plot(yearsList, tempsList, 'o-', linewidth=2)
@@ -428,77 +451,87 @@ def annual_means_per_region(regions, years, consolidatedFile, output_dir="./"):
             plt.ylabel('Temperature (°C)')
             plt.title(f'Annual Mean Temperatures for {regionName}')
             plt.grid(True)
-            plt.savefig(output_dir + f'/Annual Means - {regionName}.png')
+            plt.savefig(f"{output_dir}/Annual Means - {regionName}.png")
             plt.close()
 
 
-def annual_means_combined(regions, years, patterns, consolidatedFile, output_dir="./"):
-    
+def annual_means_combined(regions, years, patterns, consolidatedFile):
     plt.rcParams["figure.figsize"] = [10, 6]
     helper = TemperatureHelper.TemperatureHelper(consolidatedFile)
     
+    output_dir = "./data/charts"
+    
+    #Create single combined chart
     plt.figure()
     
+    #Process each region with different pattern
     for i, region in enumerate(regions):
         regionName = f"Region{region}"
         yearsList = []
         tempsList = []
         
+        #Calculate annual average for each year
         for year in years:
             yearlyTemps = helper.get_yearly_temperatures(regionName, year)
             
-            # Filter out None values
+            #Filter out None values
             validTemps = []
             for temp in yearlyTemps:
                 if temp is not None:
                     validTemps.append(temp)
             
+            #Calculate and store yearly average if data exists
             if len(validTemps) > 0:
-                # Calculate average
                 total = 0
                 for temp in validTemps:
                     total += temp
                 average = total / len(validTemps)
                 
-                # Store results
                 yearsList.append(year)
                 tempsList.append(average)
         
+        #Plot region data with cyclic pattern styles
         if len(yearsList) > 0:
-            # Use modulo to cycle through patterns
             patternIndex = i % len(patterns)
             pattern = patterns[patternIndex]
             
             plt.plot(yearsList, tempsList, pattern, linewidth=2, label=regionName)
     
+    #Add chart details and save
     plt.xlabel('Year')
     plt.ylabel('Temperature (°C)')
     plt.title('Annual Mean Temperatures for All Regions')
     plt.grid(True)
     plt.legend()
-    plt.savefig(output_dir + '/Annual Means - All Regions.png')
+    plt.savefig(f"{output_dir}/Annual Means - All Regions.png")
     plt.close()
 
 
-def single_day_per_region(regions, years, month, day, consolidatedFile, output_dir="./"):
+def single_day_per_region(regions, years, month, day, consolidatedFile):
     
     plt.rcParams["figure.figsize"] = [10, 6]
     helper = TemperatureHelper.TemperatureHelper(consolidatedFile)
     
+    output_dir = "./data/charts"
+    
+    #Get month name for chart title
     date = datetime.date(2000, month, 1)
     monthName = date.strftime('%B')
     
+    #Generate chart for each region
     for region in regions:
         regionName = f"Region{region}"
         yearsList = []
         tempsList = []
         
+        #Get temperature for specific day each year
         for year in years:
             temp = helper.get_daily_temperature(regionName, year, month, day)
             if temp is not None:
                 yearsList.append(year)
                 tempsList.append(temp)
         
+        #Create chart if data exists
         if len(yearsList) > 0:
             plt.figure()
             plt.plot(yearsList, tempsList, 'o-', linewidth=2)
@@ -506,53 +539,62 @@ def single_day_per_region(regions, years, month, day, consolidatedFile, output_d
             plt.ylabel('Temperature (°C)')
             plt.title(f'Temperature on {monthName} {day} for {regionName}')
             plt.grid(True)
-            plt.savefig(output_dir + f'/{monthName} {day} - {regionName}.png')
+            plt.savefig(f"{output_dir}/{monthName} {day} - {regionName}.png")
             plt.close()
 
 
-def single_day_combined(regions, years, month, day, patterns, consolidatedFile, output_dir="./"):
+def single_day_combined(regions, years, month, day, patterns, consolidatedFile):
     
     plt.rcParams["figure.figsize"] = [10, 6]
     helper = TemperatureHelper.TemperatureHelper(consolidatedFile)
     
+    output_dir = "./data/charts"
+    
+    #Get month name for chart title
     date = datetime.date(2000, month, 1)
     monthName = date.strftime('%B')
     
+    #Create single combined chart
     plt.figure()
     
+    #Process each region with different pattern
     for i, region in enumerate(regions):
         regionName = f"Region{region}"
         yearsList = []
         tempsList = []
         
+        #Get temperature for specific day each year
         for year in years:
             temp = helper.get_daily_temperature(regionName, year, month, day)
             if temp is not None:
                 yearsList.append(year)
                 tempsList.append(temp)
         
+        #Plot region data with cyclic pattern styles
         if len(yearsList) > 0:
-            # Use modulo to cycle through patterns
+        
             patternIndex = i % len(patterns)
             pattern = patterns[patternIndex]
             
             plt.plot(yearsList, tempsList, pattern, linewidth=2, label=regionName)
     
+    #Add chart details and save
     plt.xlabel('Year')
     plt.ylabel('Temperature (°C)')
     plt.title(f'Temperature on {monthName} {day} for All Regions')
     plt.grid(True)
     plt.legend()
-    plt.savefig(output_dir + f'/{monthName} {day} - All Regions.png')
+    plt.savefig(f"{output_dir}/{monthName} {day} - All Regions.png")
     plt.close()
 
 if __name__ == "__main__":
     
+    #Handle command line arguments
     if len(sys.argv) == 3:
         try:
             startYear = int(sys.argv[1])
             endYear = int(sys.argv[2])
-            #get_acceptable_cities(startYear, endYear)
+            #Get 3 random cities for each region and create regional files
             dictionary = get_three_random_cities_per_region(startYear,endYear)
             for x,y in sorted(dictionary.items()):
                 outPutfile= "./data/outputs/"+ str(x) +"region.csv"
@@ -561,9 +603,11 @@ if __name__ == "__main__":
         except ValueError:
             print("Error: Start year and end year must be integers")
     elif len(sys.argv) == 2:
+        #Consolidate regional files into one
         fileName = sys.argv[1]
         consolidate_regions(fileName)
     else:
+        #Show usage instructions
         print()
         print("Usage: python a4functions.py <start_year> <end_year>")
         print("Example: python a4functions.py 1994 2023")
@@ -572,5 +616,3 @@ if __name__ == "__main__":
         print()
         print("python a4functions.py <file_name>")
         print("python a4functions.py consolidated")
-        
-
