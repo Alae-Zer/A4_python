@@ -1,10 +1,11 @@
 from TemperatureHelper import TemperatureHelper
-import datetime
 
 def main():
+    
     helper = TemperatureHelper("./data/outputs/consolidated.csv")
     
     print("Testing get_daily_temperature method:")
+
     print(f"Temperature for Region1, 1954-01-01: {helper.get_daily_temperature('Region1', 1954, 1, 1)}")
     print(f"Temperature for Region1, 1954-01-10: {helper.get_daily_temperature('Region1', 1954, 1, 10)}")
     print(f"Temperature for Region2, 1954-01-01: {helper.get_daily_temperature('Region2', 1954, 1, 1)}")
@@ -12,6 +13,7 @@ def main():
     print(f"Testing with invalid date: {helper.get_daily_temperature('Region1', 1954, 2, 30)}")
     
     print("\nTesting get_yearly_temperatures method:")
+
     tempsRegion1_1954 = helper.get_yearly_temperatures('Region1', 1954)
     if len(tempsRegion1_1954) > 0:
         print(f"First 10 temperatures for Region1, 1954: {tempsRegion1_1954[:10]}")

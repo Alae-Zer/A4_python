@@ -392,142 +392,158 @@ def consolidate_regions(fileName):
 
 
 def annual_means_per_region(regions, years, consolidatedFile, output_dir="./"):
-    """Creates and saves one graph per region, each showing the
-    annual mean temperatures for that region.
-    """
-    plt.rcParams["figure.figsize"] = [10, 6]  # bigger than default
+    
+    plt.rcParams["figure.figsize"] = [10, 6]
     helper = TemperatureHelper.TemperatureHelper(consolidatedFile)
     
     for region in regions:
-        region_name = f"Region{region}"
-        annual_means = []
+        regionName = f"Region{region}"
+        yearsList = []
+        tempsList = []
         
         for year in years:
-            yearly_temps = helper.get_yearly_temperatures(region_name, year)
-            valid_temps = [t for t in yearly_temps if t is not None]
+            yearlyTemps = helper.get_yearly_temperatures(regionName, year)
             
-            if len(valid_temps) > 0:
-                annual_mean = sum(valid_temps) / len(valid_temps)
-                annual_means.append((year, annual_mean))
+            # Filter out None values
+            validTemps = []
+            for temp in yearlyTemps:
+                if temp is not None:
+                    validTemps.append(temp)
             
-        if len(annual_means) > 0:
-            x_years = [item[0] for item in annual_means]
-            y_temps = [item[1] for item in annual_means]
+            if len(validTemps) > 0:
+                # Calculate average
+                total = 0
+                for temp in validTemps:
+                    total += temp
+                average = total / len(validTemps)
+                
+                # Store results
+                yearsList.append(year)
+                tempsList.append(average)
             
+        if len(yearsList) > 0:
             plt.figure()
-            plt.plot(x_years, y_temps, 'o-', linewidth=2)
+            plt.plot(yearsList, tempsList, 'o-', linewidth=2)
             plt.xlabel('Year')
             plt.ylabel('Temperature (°C)')
-            plt.title(f'Annual Mean Temperatures for {region_name}')
+            plt.title(f'Annual Mean Temperatures for {regionName}')
             plt.grid(True)
-            plt.savefig(os.path.join(output_dir, f'Annual Means - {region_name}.png'))
+            plt.savefig(output_dir + f'/Annual Means - {regionName}.png')
             plt.close()
 
 
 def annual_means_combined(regions, years, patterns, consolidatedFile, output_dir="./"):
-    """Creates and saves a single graph showing the annual means
-    for all the regions, one series per region.
-    Use the specified patterns for the legend.
-    """
-    plt.rcParams["figure.figsize"] = [10, 6]  # bigger than default
+    
+    plt.rcParams["figure.figsize"] = [10, 6]
     helper = TemperatureHelper.TemperatureHelper(consolidatedFile)
     
     plt.figure()
     
     for i, region in enumerate(regions):
-        region_name = f"Region{region}"
-        annual_means = []
+        regionName = f"Region{region}"
+        yearsList = []
+        tempsList = []
         
         for year in years:
-            yearly_temps = helper.get_yearly_temperatures(region_name, year)
-            valid_temps = [t for t in yearly_temps if t is not None]
+            yearlyTemps = helper.get_yearly_temperatures(regionName, year)
             
-            if len(valid_temps) > 0:
-                annual_mean = sum(valid_temps) / len(valid_temps)
-                annual_means.append((year, annual_mean))
+            # Filter out None values
+            validTemps = []
+            for temp in yearlyTemps:
+                if temp is not None:
+                    validTemps.append(temp)
+            
+            if len(validTemps) > 0:
+                # Calculate average
+                total = 0
+                for temp in validTemps:
+                    total += temp
+                average = total / len(validTemps)
+                
+                # Store results
+                yearsList.append(year)
+                tempsList.append(average)
         
-        if len(annual_means) > 0:
-            x_years = [item[0] for item in annual_means]
-            y_temps = [item[1] for item in annual_means]
+        if len(yearsList) > 0:
+            # Use modulo to cycle through patterns
+            patternIndex = i % len(patterns)
+            pattern = patterns[patternIndex]
             
-            pattern = patterns[i % len(patterns)]  # Cycle through patterns if needed
-            plt.plot(x_years, y_temps, pattern, linewidth=2, label=region_name)
+            plt.plot(yearsList, tempsList, pattern, linewidth=2, label=regionName)
     
     plt.xlabel('Year')
     plt.ylabel('Temperature (°C)')
     plt.title('Annual Mean Temperatures for All Regions')
     plt.grid(True)
     plt.legend()
-    plt.savefig(os.path.join(output_dir, 'Annual Means - All Regions.png'))
+    plt.savefig(output_dir + '/Annual Means - All Regions.png')
     plt.close()
 
 
 def single_day_per_region(regions, years, month, day, consolidatedFile, output_dir="./"):
-    """Creates and saves one graph per region, each showing the
-    temperature on the specified day for each specified year.
-    """
-    plt.rcParams["figure.figsize"] = [10, 6]  # bigger than default
+    
+    plt.rcParams["figure.figsize"] = [10, 6]
     helper = TemperatureHelper.TemperatureHelper(consolidatedFile)
     
-    month_name = datetime.date(2000, month, 1).strftime('%B')
+    date = datetime.date(2000, month, 1)
+    monthName = date.strftime('%B')
     
     for region in regions:
-        region_name = f"Region{region}"
-        day_temps = []
+        regionName = f"Region{region}"
+        yearsList = []
+        tempsList = []
         
         for year in years:
-            temp = helper.get_daily_temperature(region_name, year, month, day)
+            temp = helper.get_daily_temperature(regionName, year, month, day)
             if temp is not None:
-                day_temps.append((year, temp))
+                yearsList.append(year)
+                tempsList.append(temp)
         
-        if len(day_temps) > 0:
-            x_years = [item[0] for item in day_temps]
-            y_temps = [item[1] for item in day_temps]
-            
+        if len(yearsList) > 0:
             plt.figure()
-            plt.plot(x_years, y_temps, 'o-', linewidth=2)
+            plt.plot(yearsList, tempsList, 'o-', linewidth=2)
             plt.xlabel('Year')
             plt.ylabel('Temperature (°C)')
-            plt.title(f'Temperature on {month_name} {day} for {region_name}')
+            plt.title(f'Temperature on {monthName} {day} for {regionName}')
             plt.grid(True)
-            plt.savefig(os.path.join(output_dir, f'{month_name} {day} - {region_name}.png'))
+            plt.savefig(output_dir + f'/{monthName} {day} - {regionName}.png')
             plt.close()
 
 
 def single_day_combined(regions, years, month, day, patterns, consolidatedFile, output_dir="./"):
-    """Creates and saves a single graph showing the temperatures on
-    the specified day for the specified years, one series per region.
-    Use the specified patterns for the legend.
-    """
-    plt.rcParams["figure.figsize"] = [10, 6]  # bigger than default
+    
+    plt.rcParams["figure.figsize"] = [10, 6]
     helper = TemperatureHelper.TemperatureHelper(consolidatedFile)
     
-    month_name = datetime.date(2000, month, 1).strftime('%B')
+    date = datetime.date(2000, month, 1)
+    monthName = date.strftime('%B')
     
     plt.figure()
     
     for i, region in enumerate(regions):
-        region_name = f"Region{region}"
-        day_temps = []
+        regionName = f"Region{region}"
+        yearsList = []
+        tempsList = []
         
         for year in years:
-            temp = helper.get_daily_temperature(region_name, year, month, day)
+            temp = helper.get_daily_temperature(regionName, year, month, day)
             if temp is not None:
-                day_temps.append((year, temp))
+                yearsList.append(year)
+                tempsList.append(temp)
         
-        if len(day_temps) > 0:
-            x_years = [item[0] for item in day_temps]
-            y_temps = [item[1] for item in day_temps]
+        if len(yearsList) > 0:
+            # Use modulo to cycle through patterns
+            patternIndex = i % len(patterns)
+            pattern = patterns[patternIndex]
             
-            pattern = patterns[i % len(patterns)]
-            plt.plot(x_years, y_temps, pattern, linewidth=2, label=region_name)
+            plt.plot(yearsList, tempsList, pattern, linewidth=2, label=regionName)
     
     plt.xlabel('Year')
     plt.ylabel('Temperature (°C)')
-    plt.title(f'Temperature on {month_name} {day} for All Regions')
+    plt.title(f'Temperature on {monthName} {day} for All Regions')
     plt.grid(True)
     plt.legend()
-    plt.savefig(os.path.join(output_dir, f'{month_name} {day} - All Regions.png'))
+    plt.savefig(output_dir + f'/{monthName} {day} - All Regions.png')
     plt.close()
 
 if __name__ == "__main__":
@@ -536,6 +552,7 @@ if __name__ == "__main__":
         try:
             startYear = int(sys.argv[1])
             endYear = int(sys.argv[2])
+            #get_acceptable_cities(startYear, endYear)
             dictionary = get_three_random_cities_per_region(startYear,endYear)
             for x,y in sorted(dictionary.items()):
                 outPutfile= "./data/outputs/"+ str(x) +"region.csv"
